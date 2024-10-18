@@ -15,7 +15,7 @@ describe("Loan Calculation", () => {
 
     const result: LoanResult = calculateLoan(loanInput);
 
-    expect(result.monthlyPayment).toBeCloseTo(833.33, 2); // Check rounding
+    expect(result.monthlyPayment).toBeCloseTo(833.33, 2);
   });
 
   test("calculates repayment schedule correctly", () => {
@@ -28,7 +28,6 @@ describe("Loan Calculation", () => {
 
     const result: LoanResult = calculateLoan(loanInput);
 
-    // Check that the repayment schedule is filled until the debt is zero
     expect(result.repaymentSchedule.length).toBeGreaterThan(0);
     expect(
       result.repaymentSchedule[result.repaymentSchedule.length - 1]
@@ -46,6 +45,6 @@ describe("Loan Calculation", () => {
 
     const result: LoanResult = calculateLoan(loanInput);
 
-    expect(result.remainingDebtAtInterestLock).toBeGreaterThan(0); // Expect debt to be saved
+    expect(result.remainingDebtAtInterestLock).toBeGreaterThan(0);
   });
 });
