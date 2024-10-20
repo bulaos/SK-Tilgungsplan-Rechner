@@ -1,6 +1,6 @@
 "use client";
 
-import { createTheme, Theme } from "@mui/material";
+import { createTheme } from "@mui/material";
 
 export const theme = createTheme({
   palette: {
@@ -15,10 +15,10 @@ export const theme = createTheme({
     MuiCssBaseline: {
       styleOverrides: {
         "input[type=number]": {
-          "-moz-appearance": "textfield",
+          MozAppearance: "textfield",
         },
         "input::-webkit-outer-spin-button, input::-webkit-inner-spin-button": {
-          "-webkit-appearance": "none",
+          WebkitAppearance: "none",
           margin: 0,
         },
       },

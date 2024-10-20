@@ -1,10 +1,10 @@
 "use client";
 import { formatToEuroString } from "@/app/utils/formatToEuroString";
 import { Box, Button, Slider, TextField, Typography } from "@mui/material";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
-  calculateLoan,
+  calculateRepaymentPlan,
   LoanResult,
 } from "../../repayment-plan/calculateRepaymentPlan";
 import { FormInput } from "../Input/FormInput";
@@ -20,6 +20,19 @@ export type FormValues = {
   interestLockInYears: number;
 };
 
+const hasValuesChanged = (
+  previousValues: FormValues,
+  currentValues: FormValues
+) => {
+  return (
+    previousValues.loan !== currentValues.loan ||
+    previousValues.interestRate !== currentValues.interestRate ||
+    previousValues.initialRepaymentRate !==
+      currentValues.initialRepaymentRate ||
+    previousValues.interestLockInYears !== currentValues.interestLockInYears
+  );
+};
+
 export const RepaymentForm = () => {
   const [showTable, setShowTable] = useState(false);
   const [loanData, setLoanData] = useState<LoanResult | null>(null);
@@ -27,13 +40,7 @@ export const RepaymentForm = () => {
 
   const formRef = useRef<HTMLDivElement | null>(null);
 
-  const {
-    control,
-    getValues,
-    watch,
-    setValue,
-    formState: { isDirty },
-  } = useForm<FormValues>({
+  const { control, getValues, watch, setValue } = useForm<FormValues>({
     defaultValues: {
       loan: 250000,
       interestRate: 2,
@@ -56,7 +63,7 @@ export const RepaymentForm = () => {
     interestLockInYears: 0,
   });
 
-  const calculateAndUpdate = () => {
+  const calculateAndUpdateRepayment = useCallback(() => {
     const formValues = getValues();
 
     if (
@@ -64,7 +71,7 @@ export const RepaymentForm = () => {
       formValues.interestRate > 0 &&
       formValues.initialRepaymentRate > 0
     ) {
-      const result = calculateLoan({
+      const result = calculateRepaymentPlan({
         loanAmount: formValues.loan,
         interestRate: formValues.interestRate,
         initialRepaymentRate: formValues.initialRepaymentRate,
@@ -74,28 +81,21 @@ export const RepaymentForm = () => {
     } else {
       setLoanData(null);
     }
-  };
+  }, [getValues]);
 
   useEffect(() => {
     if (showTable) {
       const currentValues = getValues();
 
-      if (
-        currentValues.loan !== previousValues.current.loan ||
-        currentValues.interestRate !== previousValues.current.interestRate ||
-        currentValues.initialRepaymentRate !==
-          previousValues.current.initialRepaymentRate ||
-        currentValues.interestLockInYears !==
-          previousValues.current.interestLockInYears
-      ) {
-        calculateAndUpdate();
+      if (hasValuesChanged(previousValues.current, currentValues)) {
+        calculateAndUpdateRepayment();
         previousValues.current = currentValues;
       }
     }
-  }, [watchedValues, showTable]);
+  }, [watchedValues, showTable, getValues, calculateAndUpdateRepayment]);
 
   const handleCalculate = () => {
-    calculateAndUpdate();
+    calculateAndUpdateRepayment();
     setShowTable(true);
     setHideButton(true);
 
@@ -104,10 +104,11 @@ export const RepaymentForm = () => {
       const element = document.getElementById("tableSection");
       if (element) {
         const elementPosition =
-          element.getBoundingClientRect().top + window.scrollY; // Get the absolute position of the element
+          element.getBoundingClientRect().top + window.scrollY;
         window.scrollTo({
-          top: elementPosition - 200, // Offset by -20px
-          behavior: "smooth", // Smooth scrolling
+          // -200 as the header needs to be taken into account
+          top: elementPosition - 200,
+          behavior: "smooth",
         });
       }
     }, 100);

@@ -22,8 +22,8 @@ export default function Home() {
         <Image
           src={heroImage}
           alt="Group of young people working and laughing"
-          layout="fill"
-          objectFit="cover"
+          fill
+          style={{ objectFit: "cover" }}
           priority
         />
         <Box

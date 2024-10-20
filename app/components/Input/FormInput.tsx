@@ -30,13 +30,12 @@ export const FormInput = ({
   const [helperText, setHelperText] = useState("");
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    let value = event.target.value;
+    const value = event.target.value;
 
     const numericRegex = /^[0-9]*[.,]?[0-9]*$/;
     if (numericRegex.test(value)) {
       const formattedValue = value.replace(".", ",");
       setDisplayValue(formattedValue);
-      parseInt;
 
       // better solutions possible
       const savedValue = formattedValue.replace(",", ".");
@@ -77,7 +76,7 @@ export const FormInput = ({
             <InputAdornment position="start">{startAdornment}</InputAdornment>
           }
           onChange={handleChange}
-          value={displayValue} 
+          value={displayValue}
         />
         {error && <FormHelperText error>{helperText}</FormHelperText>}
       </FormControl>
